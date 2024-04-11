@@ -1,5 +1,17 @@
 export function compile(ast, variablesStatus) {
     let compiledCode = "";
+    const compileCondition = (condition) => {
+        let value;
+        if (condition.value.type === "BoolValue") {
+            value = condition.value.value;
+        } else if (condition.value.type === "CharValue") {
+            value = '${condition.value.value}';
+        } else {
+            value = condition.value;
+        }
+        let operator = "===";
+        return `'${condition.variable} ${operator} ${value}'`;
+    };
 
     
 
@@ -42,22 +54,27 @@ export function compile(ast, variablesStatus) {
 
 
         }
-        else if (node.type === "While") {
+        else if (node.type === "WhileVariable" || node.type === "WhileCondition") {
             const conditionStatus = variablesStatus[node.variable];
-            let loopCount ;
-            if (conditionStatus.type !== "bool") {
-                throw new Error(`Error de compilación: La variable del 'while' debe ser de tipo booleano '${conditionStatus}'`);
+            if (!conditionStatus || conditionStatus.type !== "bool") {
+                throw new Error(`Error de compilación: La variable del 'while' debe ser de tipo booleano`);
             }
             compiledCode += `let loopCount = 0;\n`;
-            compiledCode += `while (${node.variable}) {\n`; // Corregido aquí
+            if (node.type === "WhileVariable") {
+                compiledCode += `while (${node.variable}) {\n`;
+            } else if (node.type === "WhileCondition") {
+                compiledCode += `while (${node.variable} \n ${node.condition.operador.operador} \n ${node.condition.variable}) {\n`;
+            }
             compiledCode += `  if (loopCount >= 1) break;\n`;
             node.body.forEach(innerNode => {
                 compiledCode += `  ${compile([innerNode], variablesStatus)}\n`;
             });
-        
+            
             compiledCode += `  loopCount++;\n`;
             compiledCode += `}\n`;
         }
+        
+        
         
         else if (node.type === "Function") {
             compiledCode += `function ${node.identifier}() {\n`;

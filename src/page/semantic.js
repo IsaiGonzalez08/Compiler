@@ -18,7 +18,7 @@ export function analyzeSemantics(ast) {
                 }
             });
         }
-        else if (statement.type === "While") {
+        else if (statement.type === "WhileVariable") {
             const variable = statement.variable;
             const variableStatus = variablesStatus.get(variable);
             
@@ -32,6 +32,40 @@ export function analyzeSemantics(ast) {
                 }
             }
         }
+        else if (statement.type === "WhileCondition") {
+            // Verificar que la variable en la condición esté declarada
+            const variable = statement.variable;
+            if (!variablesStatus.has(variable)) {
+                errors.push(`Error semántico: La variable '${variable}' en la condición del WhileCondition no está declarada`);
+            } else {
+                const variableType = variablesStatus.get(variable).type;
+                if (variableType !== "bool") {
+                    errors.push(`Error semántico: La variable '${variable}' en la condición del WhileCondition debe ser de tipo booleano`);
+                } else if (!variablesStatus.get(variable).initialized) {
+                    errors.push(`Error semántico: La variable '${variable}' en la condición del WhileCondition no está inicializada`);
+                }
+            }
+            
+            // Verificar la condición del WhileCondition
+            const condition = statement.condition;
+            if (condition.type !== "Condition") {
+                errors.push("Error semántico: La condición del WhileCondition debe ser una comparación");
+            } else {
+                const conditionVariable = condition.variable;
+                if (!variablesStatus.has(conditionVariable)) {
+                    errors.push(`Error semántico: La variable '${conditionVariable}' en la condición del WhileCondition no está declarada`);
+                } else {
+                    const conditionVariableType = variablesStatus.get(conditionVariable).type;
+                    if (conditionVariableType !== "bool") {
+                        errors.push(`Error semántico: La variable '${conditionVariable}' en la condición del WhileCondition debe ser de tipo booleano`);
+                    } else if (!variablesStatus.get(conditionVariable).initialized) {
+                        errors.push(`Error semántico: La variable '${conditionVariable}' en la condición del WhileCondition no está inicializada`);
+                    }
+                }
+            }
+        }
+        
+        
         
         else if (statement.type === "Print") {
             const variable = statement.variable;

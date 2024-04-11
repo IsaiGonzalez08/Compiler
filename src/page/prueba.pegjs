@@ -139,12 +139,12 @@ While
   = "while" _ "(" variable:Identifier ")" _ ":" _ body:Statement+ _ ":" _ {
       
       return {
-        type: "While",
+        type: "WhileVariable",
         variable: variable,
         body: body
       };
     }
-  / "while" _ "(" _  variable:Identifier _ condition:Condition  _ ":" _ body:Statement+  _ ":" _ {
+  /"while" _ "(" _  variable:Identifier _ condition:Condition  _ ":" _ body:Statement+  _ ":" _ {
     return {
       type: "WhileCondition",
       variable: variable,
@@ -154,14 +154,35 @@ While
   }
 
 Condition
-  =  "==" variable:Identifier _ ")"{
+  =  operador:Operador _ variable:Identifier _ ")"{
       return {
         type: "Condition",
         variable: variable,
+        operador: operador,
       };
     }
 
+Operador 
+  = "=="{
+    return{
+       type: "Operador",
+        operador: "=="
 
+    }
+  }
+  / "and" {
+    return{
+       type: "Operador",
+        operador: "&&"
+
+    }
+  }  
+  / "or"{
+    return{
+       type: "Operador",
+        operador: "||"
+    }
+  }
 
 Val
   = [a-z0-9]* { return text(); }

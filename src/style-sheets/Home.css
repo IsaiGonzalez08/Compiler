@@ -1,0 +1,32 @@
+.container-main-nc{
+    /* background-color: red; */
+    width: 50%;
+}
+
+.container-f{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-start;
+    width: 100vw;
+    position: relative;
+    right: 43%;
+}
+
+.code-area{
+    min-width: 48%;
+    height: 100%;
+    /* background-color: blue; */
+}
+
+.docs{
+    /* min-width: 48%; */
+    width: 100%;
+    height: 100%;
+    /* background-color: red; */
+}
+
+.textarea-docs{
+    height: 80vh !important;
+    resize: none;
+}

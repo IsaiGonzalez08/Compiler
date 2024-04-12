@@ -27,9 +27,9 @@ export function compile(ast, variablesStatus) {
                     if (typeof value === "object" && value.type === "BoolValue") {
                         value = value.value;
                     } else if (typeof value === "string") {
-                        value = "${value}";
+                        value = `'${value}'`; 
                     } else if (typeof value === "object" && value.type === "CharValue") {
-                        value = '${value.value}';
+                        value = `'${value.value}'`;
                     }
 
                     varInit += ` = ${value}`;
@@ -54,6 +54,24 @@ export function compile(ast, variablesStatus) {
 
 
         }
+        else if (node.type === "If") {
+            compiledCode += `if (${node.variable}) {\n`;
+            node.body.forEach(innerNode => {
+                compiledCode += `  ${compile([innerNode], variablesStatus)}\n`;
+            });
+            compiledCode += `}\n`;
+        }
+        else if (node.type === "IfCondition") {
+            
+            compiledCode += `if (${node.variable} ${node.condition.operador.operador} ${node.condition.variable}) {\n`;
+            
+            node.body.forEach(innerNode => {
+                compiledCode += `  ${compile([innerNode], variablesStatus)}\n`;
+            });
+            
+            compiledCode += `}\n`;
+        }
+        
         else if (node.type === "WhileVariable" || node.type === "WhileCondition") {
             const conditionStatus = variablesStatus[node.variable];
             if (!conditionStatus || conditionStatus.type !== "bool") {
@@ -62,9 +80,11 @@ export function compile(ast, variablesStatus) {
             compiledCode += `let loopCount = 0;\n`;
             if (node.type === "WhileVariable") {
                 compiledCode += `while (${node.variable}) {\n`;
-            } else if (node.type === "WhileCondition") {
-                compiledCode += `while (${node.variable} \n ${node.condition.operador.operador} \n ${node.condition.variable}) {\n`;
-            }
+            } 
+                else if (node.type === "WhileCondition") {
+                    compiledCode += `while (${node.variable} ${node.condition.operador.operador} ${node.condition.variable}) {\n`;
+                }
+                
             compiledCode += `  if (loopCount >= 1) break;\n`;
             node.body.forEach(innerNode => {
                 compiledCode += `  ${compile([innerNode], variablesStatus)}\n`;
@@ -73,42 +93,19 @@ export function compile(ast, variablesStatus) {
             compiledCode += `  loopCount++;\n`;
             compiledCode += `}\n`;
         }
-        
-        
-        
         else if (node.type === "Function") {
-            compiledCode += `function ${node.identifier}() {\n`;
-            if (Array.isArray(node.body)) {
-                node.body.forEach(innerNode => {
-                    compiledCode += `  ${compile([innerNode], variablesStatus)}\n`;
-                });
-            } else {
-                compiledCode += `  ${compile([node.body], variablesStatus)}\n`;
-            }
-            compiledCode += `}\n`;
-            compiledCode += `${node.identifier}()\n`;
-        } else if (node.type === "Switch") {
-            const variableType = variablesStatus[node.variable].type;
-            compiledCode += `switch (${node.variable}) {\n`;
-
-            node.cases.forEach(caseBlock => {
-                let caseValue = caseBlock.case.value;
-                if (variableType === "int" || variableType === "float") {
-                    compiledCode += `  case ${caseValue}:\n`;
-                } else {
-                    compiledCode += `  case "${caseValue}":\n`;
-                }
-
-                const bodyNodes = Array.isArray(caseBlock.body) ? caseBlock.body : [caseBlock.body];
-                bodyNodes.forEach(innerNode => {
-                    compiledCode += `    ${compile([innerNode], variablesStatus)};\n`;
-                });
-                compiledCode += "    break;\n";
-            });
-
-            compiledCode += `  default:\n     console.log("no entro en ningun caso"); \n     break;\n`;
-            compiledCode += `}\n`;
+        
+                compiledCode += `function ${node.identifier}(${node.variable}) {\n`;
+                compiledCode += `  console.log(${node.print.variable});\n`;
+                compiledCode += `  return ${node.returnid};\n`;
+                compiledCode += `}\n`;
+                compiledCode += `${node.identifier}(${node.variable})\n`;
+            
+        
         }
+        
+        
+        
     });
     return compiledCode;
 }

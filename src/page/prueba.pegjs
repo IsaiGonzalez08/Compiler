@@ -9,6 +9,8 @@ Statement
 
   /While
   /Print
+  /Function
+  /If
   
 
 Declaration
@@ -135,6 +137,34 @@ Print
       };
     }
 
+Function
+  = "func" _ id:Identifier _ "(" variable:Identifier")" _ ":" _ print:Print _ "return" _ returnid:Identifier _ ";" _ ":" {
+      return {
+        type: "Function",
+        identifier: id,
+        variable: variable,
+        returnid: returnid,
+        print:print,
+      }; 
+      }
+
+If
+  = "if" _ "(" variable:Identifier ")" _ ":" _ body:Statement+ _ ":" _ {
+   return {
+        type: "If",
+        variable: variable,
+        body: body
+      };
+      }
+  / "if" _ "(" _  variable:Identifier _ condition:Condition  _   ")" _ ":" _ body:Statement+  _ ":" _ {
+    return {
+      type: "IfCondition",
+      variable: variable,
+      condition: condition,
+      body:body
+    };
+  }
+
 While
   = "while" _ "(" variable:Identifier ")" _ ":" _ body:Statement+ _ ":" _ {
       
@@ -144,7 +174,7 @@ While
         body: body
       };
     }
-  /"while" _ "(" _  variable:Identifier _ condition:Condition  _ ":" _ body:Statement+  _ ":" _ {
+  /"while" _ "(" _  variable:Identifier _ condition:Condition  _  ")" _ ":" _ body:Statement+  _ ":" _ {
     return {
       type: "WhileCondition",
       variable: variable,
@@ -154,7 +184,7 @@ While
   }
 
 Condition
-  =  operador:Operador _ variable:Identifier _ ")"{
+  =  operador:Operador _ variable:Identifier _ {
       return {
         type: "Condition",
         variable: variable,

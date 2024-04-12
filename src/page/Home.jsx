@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Monaco from "@monaco-editor/react"; 
 import '../style-sheets/Home.css'
 import { validateGrammar } from "./Analizador-sintatico";
@@ -51,10 +51,6 @@ function Home() {
     while(x or y):
       contenido;
     :
-
-    while(x nor y):
-      contenido;
-    :
     
     Funciones
     func nombreFuncion(x):
@@ -73,11 +69,6 @@ function Home() {
     :
 
     func nombreFuncion(x or y):
-      contenido;
-      return x;
-    :
-
-    func nombreFuncion(x nor y):
       contenido;
       return x;
     :
@@ -117,16 +108,24 @@ function Home() {
             <div >
               {validationGrammar.message}
             </div>
-            <div >
-              <p>Mensage</p>
+            { <div >
+              
               {validationSemantic.message}
-            </div>
+            </div> }
             <div >
-              <p>result</p>
+              
               {validationSemantic.result}
             </div>
           </div>
         )}
+<br></br>
+            <div className="mockup-code">
+              
+              <code><pre data-prefix=">" className="text-primary">{validationSemantic?.message}</pre></code>
+             </div>
+             <div className="bg-red-100 text-purple-500 p-4 mt-4">
+              {validationSemantic?.result}
+            </div>
 
 
           <div style={{}}>
@@ -143,6 +142,7 @@ function Home() {
           <textarea className="textarea-docs" value={documentation} readOnly></textarea>
         </div>
       </div>
+
 
     </div>
   );

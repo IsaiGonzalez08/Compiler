@@ -25,7 +25,7 @@ export function validateSemantic(input){
         } else {
             const compiledCode = compile(ast, variablesStatus);
             let output = captureOutput(() => eval(compiledCode));
-            const resultMessage = "Resultado del código:\n" + output;
+            const resultMessage = "" + output;
             return { success: true, message: compiledCode, result: resultMessage, tokens:tokens};
         }
     } catch (error) {
